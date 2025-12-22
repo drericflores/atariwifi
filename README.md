@@ -1,35 +1,32 @@
 # atariwifi
----
-
-```markdown
 # Atari ST Pico W Wi-Fi Interface Project
 
-## Overview
+ Overview
 
-This project enables an **Atari ST 1040** to access **modern Wi-Fi networks** by offloading all TCP/IP and 802.11 functionality to a **Raspberry Pi Pico W**. The Atari communicates with the Pico W through a **hardware interface (cartridge port or serial)** using a deterministic command protocol, while the Pico W acts as a **network coprocessor**.
+This project enables an "Atari ST 1040" to access "modern Wi-Fi networks" by offloading all TCP/IP and 802.11 functionality to a "Raspberry Pi Pico W". The Atari communicates with the Pico W through a "hardware interface (cartridge port or serial)" using a deterministic command protocol, while the Pico W acts as a "network coprocessor".
 
-The result is a **period-correct, low-latency network solution** that allows classic Atari ST systems to use Wi-Fi without modifying TOS or burdening the 68000 CPU with modern networking stacks.
+The result is a "period-correct, low-latency network solution" that allows classic Atari ST systems to use Wi-Fi without modifying TOS or burdening the 68000 CPU with modern networking stacks.
 
 This design intentionally mirrors historical approaches used by Ethernet cartridges, ACSI peripherals, and modem drivers—modernized with embedded Wi-Fi hardware.
 
----
 
-## Design Philosophy
 
-- **No Wi-Fi stack on the Atari**
-- **No TCP/IP stack on the Atari**
-- **All networking is offloaded**
-- **Deterministic, debuggable protocol**
-- **Compatible with real hardware and emulators**
-- **Built using period-appropriate tools**
+ Design Philosophy
 
-The Atari ST behaves as a **client of a network device**, not as a network host.
+- "No Wi-Fi stack on the Atari"
+- "No TCP/IP stack on the Atari"
+- "All networking is offloaded"
+- "Deterministic, debuggable protocol"
+- "Compatible with real hardware and emulators"
+- "Built using period-appropriate tools"
 
----
+The Atari ST behaves as a "client of a network device", not as a network host.
 
-## System Architecture
 
-```
+
+ System Architecture
+
+
 
 Atari ST 1040 (68000, TOS)
 │
@@ -42,19 +39,19 @@ Atari ST 1040 (68000, TOS)
 ├── Socket manager
 └── Atari protocol adapter
 
-```
 
-### Responsibilities
+
+# Responsibilities
 
 | Component | Responsibility |
-|--------|---------------|
+|--||
 | Atari ST | Application logic, GEM UI, legacy software |
 | Pico W | Wi-Fi, DHCP, DNS, TCP, buffering, retransmission |
 | Protocol | Framing, commands, responses |
 
----
 
-## Supported Atari Systems
+
+ Supported Atari Systems
 
 - Atari 1040ST / STF / STFM
 - Atari STE
@@ -62,11 +59,11 @@ Atari ST 1040 (68000, TOS)
 - Atari TT (planned)
 - Atari Falcon (planned)
 
----
 
-## Transport Options
 
-### Option A — Cartridge Port (Recommended)
+ Transport Options
+
+# Option A — Cartridge Port (Recommended)
 
 - 8-bit parallel interface
 - Very low latency
@@ -74,41 +71,35 @@ Atari ST 1040 (68000, TOS)
 - Ideal for TCP/IP offload
 - Historically accurate (side-car devices)
 
-### Option B — RS-232 Serial (Fallback)
+# Option B — RS-232 Serial (Fallback)
 
 - 19200–115200 baud
 - Easy wiring
 - Compatible with existing serial stacks
 - Lower throughput
 
-Both transports use the **same command protocol**.
+Both transports use the "same command protocol".
 
----
 
-## Protocol Overview
 
-The Atari communicates with the Pico W using a **binary command/response protocol**.
+ Protocol Overview
 
-### Command Frame (Atari → Pico)
+The Atari communicates with the Pico W using a "binary command/response protocol".
 
-```
+# Command Frame (Atari → Pico)
 
 [CMD][LEN][DATA...]
 
-```
+# Response Frame (Pico → Atari)
 
-### Response Frame (Pico → Atari)
 
-```
 
 [STATUS][LEN][DATA...]
 
-```
-
-### Core Commands
+# Core Commands
 
 | CMD | Function |
-|----|---------|
+|-||
 | 0x01 | Initialize Wi-Fi |
 | 0x02 | Connect to Access Point |
 | 0x03 | Open TCP Socket |
@@ -122,13 +113,13 @@ The protocol is intentionally simple to allow:
 - Deterministic behavior
 - Stable driver behavior under TOS
 
----
 
-## Software Components
 
-### Atari ST Side
+ Software Components
 
-- Written in **ANSI C**
+# Atari ST Side
+
+- Written in "ANSI C"
 - Compatible with:
   - HiSoft C
   - Pure C
@@ -138,7 +129,7 @@ The protocol is intentionally simple to allow:
   - `.ACC` desk accessory
   - STiNG network driver (optional)
 
-#### Features
+ Features
 
 - Cartridge or serial I/O routines
 - Protocol encoder/decoder
@@ -146,11 +137,11 @@ The protocol is intentionally simple to allow:
 - Optional GEM configuration UI
 - Optional STiNG compatibility layer
 
----
 
-### Pico W Firmware
 
-- Written in **C using Pico SDK**
+# Pico W Firmware
+
+- Written in "C using Pico SDK"
 - Uses:
   - CYW43 Wi-Fi driver
   - lwIP TCP/IP stack
@@ -161,53 +152,23 @@ The protocol is intentionally simple to allow:
   - Buffering and flow control
   - Atari command parsing
 
-The Pico W appears to the Atari as a **smart modem / network adapter**.
+The Pico W appears to the Atari as a "smart modem / network adapter".
 
----
 
-## Directory Layout
 
-```
+ Directory Layout
 
-atari-pico-wifi/
-├── atari/
-│   ├── driver/
-│   │   ├── pico_wifi.c
-│   │   ├── pico_wifi.h
-│   │   └── cart_io.s
-│   ├── test/
-│   │   └── wifi_test.prg
-│   └── gem/
-│       └── wifi_config.c
-│
-├── pico/
-│   ├── src/
-│   │   ├── main.c
-│   │   ├── protocol.c
-│   │   ├── wifi.c
-│   │   └── tcp.c
-│   ├── CMakeLists.txt
-│   └── pico_sdk_import.cmake
-│
-├── hardware/
-│   ├── cartridge_port_pinout.md
-│   ├── wiring_diagram.png
-│   └── level_shifting_notes.md
-│
-├── docs/
-│   ├── protocol_spec.md
-│   ├── sting_integration.md
-│   └── troubleshooting.md
-│
-└── README.md
+atari-pico-wifi/ ←Root 
+Refer to the create_project.sh
+This create_project.sh will create the development tree.
+The below commands will convert the script into an executable and will generate the necessary development folders.
 
-```
+chmod +x create_project.sh
+./create_project.sh
 
----
+ STiNG / MiNTNet Integration (Optional)
 
-## STiNG / MiNTNet Integration (Optional)
-
-This project can optionally expose itself as a **STiNG network device**, enabling legacy applications such as:
+This project can optionally expose itself as a "STiNG network device", enabling legacy applications such as:
 
 - FTP clients
 - Telnet
@@ -218,11 +179,9 @@ This requires:
 - Implementing STiNG device hooks
 - Mapping socket operations to Pico commands
 
----
+ Hardware Notes
 
-## Hardware Notes
-
-- **Level shifting is required** (5V Atari ↔ 3.3V Pico)
+- "Level shifting is required" (5V Atari ↔ 3.3V Pico)
 - Cartridge port provides sufficient bandwidth
 - Pico W power can be supplied via:
   - External 5V
@@ -230,9 +189,7 @@ This requires:
 
 A side-car enclosure is recommended for mechanical safety.
 
----
-
-## Emulation Support
+ Emulation Support
 
 Fully compatible with:
 - Hatari
@@ -240,9 +197,7 @@ Fully compatible with:
 
 Development and debugging can be performed in Hatari before deployment to real machines.
 
----
-
-## Limitations
+Limitations
 
 - No raw Ethernet support (Wi-Fi only)
 - No UDP multicast (initially)
@@ -251,49 +206,38 @@ Development and debugging can be performed in Hatari before deployment to real m
 
 These are intentional tradeoffs to maintain stability and correctness.
 
----
 
-## Project Status
 
-- ✔ Architecture defined
-- ✔ Protocol specified
-- ✔ Atari driver skeleton implemented
-- ✔ Pico firmware skeleton implemented
-- ⏳ Full TCP socket handling
-- ⏳ STiNG compatibility layer
-- ⏳ GEM configuration UI
+ Project Status
 
----
+- Architecture defined
+- Protocol specified
+- Atari driver skeleton implemented
+- Pico firmware skeleton implemented
+- Full TCP socket handling
+- STiNG compatibility layer
+- GEM configuration UI
 
-## Goals
+ Goals
 
 - Reliable Wi-Fi access for Atari ST systems
 - Clean driver design with no TOS patches
 - Educational reference for retro-modern hardware bridges
 - Long-term maintainability
 
----
+ License
 
-## License
+This project is intended for “educational, research, and hobbyist use”.  
+Licensing terms used MIT Licensing.
 
-This project is intended for **educational, research, and hobbyist use**.  
-Licensing terms will be finalized as the project matures.
-
----
-
-## Acknowledgements
+Acknowledgements
 
 - Atari ST hardware and documentation
 - RP2040 and Pico SDK
 - Retro-computing community
 - Developers who pioneered cartridge-port networking devices
 
----
+Final Note
 
-## Final Note
-
-This project treats the Atari ST as a **first-class computer**, not a novelty.  
-Modern connectivity is added **without compromising historical authenticity**.
-
-```
-
+This project treats the Atari ST as a "first-class computer", not a novelty.  
+Modern connectivity is added "without compromising historical authenticity".
